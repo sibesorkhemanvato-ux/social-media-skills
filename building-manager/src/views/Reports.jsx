@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Card, Button, Empty, Stat } from '../components/ui'
 import { money, num, periodLabel, shiftPeriod, faDateStr } from '../lib/utils'
-import { sum, unitDebt, fundBalance } from '../lib/calc'
+import { sum, fundBalance } from '../lib/calc'
+import { unitLedger } from '../lib/rules'
 
 export default function Reports({ db, period }) {
-  const { units, invoices, payments, expenses, settings } = db
+  const { units, invoices, payments, expenses, settings, constitution } = db
   const [unitId, setUnitId] = useState(units[0]?.id ?? '')
   const unit = units.find((u) => u.id === unitId)
 
@@ -78,7 +79,7 @@ export default function Reports({ db, period }) {
               <span>مالک: <strong>{unit.owner}</strong></span>
               <span>ساکن: <strong>{unit.resident || '—'}</strong></span>
               <span>تماس: <strong className="ltr-num">{unit.phone || '—'}</strong></span>
-              <span>مانده حساب: <strong className={unitDebt(unit.id, invoices, payments) > 0 ? 'bad-text' : 'good-text'}>{money(unitDebt(unit.id, invoices, payments))}</strong></span>
+              <span>مانده حساب: <strong className={unitLedger(unit.id, invoices, payments, constitution).total > 0 ? 'bad-text' : 'good-text'}>{money(unitLedger(unit.id, invoices, payments, constitution).total)}</strong></span>
             </div>
             {statement.length === 0 ? <Empty text="تراکنشی ثبت نشده است." /> : (
               <table className="table">

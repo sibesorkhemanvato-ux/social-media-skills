@@ -83,3 +83,34 @@ export function seedPayments(invoices) {
   })
   return out
 }
+
+export function seedVotes(units) {
+  const now = Date.now()
+  return [
+    {
+      id: uid(),
+      type: 'expense',
+      title: 'تعویض موتور درب پارکینگ',
+      desc: 'موتور فعلی دو بار در ماه گذشته قفل کرده است. پیشنهاد واحد ۳ بر اساس فاکتور پیوست.',
+      payload: { expense: { title: 'تعویض موتور درب پارکینگ', category: 'تعمیرات', amount: 4200000, date: todayISO(), note: 'مصوب رأی‌گیری' } },
+      proposedBy: units[2]?.id,
+      createdAt: new Date(now - 20 * 3600000).toISOString(),
+      deadline: new Date(now + 28 * 3600000).toISOString(),
+      ballots: { [units[0]?.id]: 'yes', [units[2]?.id]: 'yes', [units[5]?.id]: 'no' },
+      status: 'باز',
+    },
+    {
+      id: uid(),
+      type: 'general',
+      title: 'ساعت خاموشی سروصدا از ۲۳ تا ۸',
+      desc: 'پیشنهاد واحد ۶ برای رعایت سکوت در ساعات شب.',
+      payload: {},
+      proposedBy: units[5]?.id,
+      createdAt: new Date(now - 6 * 86400000).toISOString(),
+      deadline: new Date(now - 4 * 86400000).toISOString(),
+      ballots: Object.fromEntries(units.slice(0, 6).map((u) => [u.id, 'yes'])),
+      status: 'تصویب شد',
+      applied: true,
+    },
+  ]
+}

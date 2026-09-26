@@ -247,3 +247,43 @@ p { margin: 0 0 .4rem; }
   .menu { display: inline-block; }
   .content { padding: 14px; }
 }
+
+/* ---------- خودگردانی: قانون‌نامه، رأی‌گیری، نوبت‌ها ---------- */
+.me-card { border-inline-start: 4px solid var(--brand); }
+.me-card h3 { font-size: 16px; }
+.me-figure { display: flex; flex-direction: column; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; }
+.me-figure strong { font-size: 15px; }
+.who { display: flex; align-items: center; gap: 6px; }
+.who .input { min-width: 170px; }
+
+.danger-card { border-color: #fecaca; }
+.danger-card .card-head { background: #fef2f2; border-radius: 14px 14px 0 0; }
+.row-danger { background: #fff7f7 !important; }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 12px; }
+.rule {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fbfcfe;
+}
+.rule strong { display: block; font-size: 15px; }
+
+.rule-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.rule-list li { background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+
+.vote { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #fff; }
+.vote p { font-size: 13px; }
+.tally { margin: 10px 0; display: flex; flex-direction: column; gap: 6px; }
+.tally-bar { display: flex; gap: 5px; }
+.pip { width: 26px; height: 10px; border-radius: 4px; background: #e2e8f0; }
+.pip.yes { background: var(--good); }
+.pip.no { background: var(--bad); }
+
+.route { grid-column: 1 / -1; border-radius: 10px; padding: 9px 12px; font-size: 13px; }
+.route.auto { background: #dcfce7; color: #14532d; }
+.route.vote { background: #fef3c7; color: #92400e; }
+
+.duties { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.duty { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: #fbfcfe; }
+.duty.mine { border-color: var(--good); background: #f0fdf4; }
+.duty-icon { font-size: 22px; }
+.duty p { margin: 0; }

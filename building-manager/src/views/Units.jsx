@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Card, Button, Modal, Field, Badge, Empty } from '../components/ui'
 import { money, num, uid } from '../lib/utils'
-import { chargeFor, unitDebt } from '../lib/calc'
+import { chargeFor } from '../lib/calc'
+import { unitLedger } from '../lib/rules'
 
 const blank = { no: '', floor: 1, owner: '', resident: '', phone: '', area: 100, people: 2, parking: 1, vacant: false }
 
-export default function Units({ db, set }) {
-  const { units, settings, invoices, payments } = db
+export default function Units({ db, set, me }) {
+  const { units, settings, constitution, invoices, payments } = db
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(blank)
   const [q, setQ] = useState('')
@@ -57,10 +58,10 @@ export default function Units({ db, set }) {
             </thead>
             <tbody>
               {filtered.map((u) => {
-                const debt = unitDebt(u.id, invoices, payments)
+                const debt = unitLedger(u.id, invoices, payments, constitution).total
                 return (
                   <tr key={u.id}>
-                    <td><strong>{u.no}</strong> {u.vacant && <Badge tone="gray">خالی</Badge>}</td>
+                    <td><strong>{u.no}</strong> {u.vacant && <Badge tone="gray">خالی</Badge>} {u.id === me?.id && <Badge tone="blue">شما</Badge>}</td>
                     <td>{num(u.floor)}</td>
                     <td>{u.owner}</td>
                     <td>{u.resident || '—'}</td>
