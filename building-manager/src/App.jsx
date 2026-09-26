@@ -51,6 +51,14 @@ export default function App() {
   const [tab, setTab] = useState('dashboard')
   const [period, setPeriod] = useState(periodKey())
   const [menuOpen, setMenuOpen] = useState(false)
+  const [installer, setInstaller] = useState(null)
+
+  // امکان نصب اپ روی گوشی (PWA)
+  useEffect(() => {
+    const h = (e) => { e.preventDefault(); setInstaller(e) }
+    window.addEventListener('beforeinstallprompt', h)
+    return () => window.removeEventListener('beforeinstallprompt', h)
+  }, [])
 
   const me = units.find((u) => u.id === meId) ?? units[0]
 
@@ -193,6 +201,11 @@ export default function App() {
                 {units.map((u) => <option key={u.id} value={u.id}>واحد {u.no} — {u.resident || u.owner}</option>)}
               </select>
             </label>
+            {installer && (
+              <button className="chip install" onClick={() => { installer.prompt(); setInstaller(null) }}>
+                ⬇️ نصب روی گوشی
+              </button>
+            )}
             <span className={`chip ${openVotes.length ? 'warn' : 'ok'}`}>
               {openVotes.length ? `${num(openVotes.length)} رأی‌گیری باز` : 'رأی‌گیری باز نیست'}
             </span>

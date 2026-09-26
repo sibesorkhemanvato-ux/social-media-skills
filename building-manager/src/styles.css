@@ -287,3 +287,5 @@ p { margin: 0 0 .4rem; }
 .duty.mine { border-color: var(--good); background: #f0fdf4; }
 .duty-icon { font-size: 22px; }
 .duty p { margin: 0; }
+.chip.install { border: 0; cursor: pointer; background: #dbeafe; color: #1e40af; font: inherit; font-size: 12px; }
+.chip.install:hover { background: #bfdbfe; }
