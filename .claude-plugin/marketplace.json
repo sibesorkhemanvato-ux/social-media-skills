@@ -8,8 +8,8 @@
     {
       "name": "social-media-skills",
       "source": ".",
-      "description": "The complete set of Claude skills behind Charlie Hills' content system. 430k+ followers across LinkedIn, Instagram, Substack, X and YouTube. 100m+ views per year. 17 skills covering voice, LinkedIn, Instagram Reels, YouTube thumbnails, analytics, and community.",
-      "version": "1.0.1",
+      "description": "The complete set of Claude skills behind Charlie Hills' content system. 430k+ followers across LinkedIn, Instagram, Substack, X and YouTube. 100m+ views per year. 19 skills covering voice, LinkedIn, Instagram Reels, YouTube thumbnails, analytics, community, and evidence-based sales proposals.",
+      "version": "1.1.0",
       "metadata": {
         "categories": [
           "voice",
@@ -17,7 +17,8 @@
           "reels",
           "youtube",
           "analytics",
-          "community"
+          "community",
+          "sales"
         ],
         "tags": [
           "content creation",
@@ -28,7 +29,11 @@
           "apify",
           "elevenlabs",
           "heygen",
-          "remotion"
+          "remotion",
+          "sales proposals",
+          "freelancing",
+          "lead generation",
+          "pricing"
         ]
       }
     }

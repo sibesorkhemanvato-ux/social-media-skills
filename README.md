@@ -71,6 +71,8 @@ See each skill's `SKILL.md` for trigger phrases, inputs, and dependencies.
 | [gemini-carousel](skills/gemini-carousel/) | Slide-by-slide carousel generator with an approval gate. |
 | [quote-post](skills/quote-post/) | Claude writes the quote, Gemini recreates the image with the quote baked in. |
 | [analytics-dashboard](skills/analytics-dashboard/) | LinkedIn Analytics export to interactive React dashboard plus 5 data-backed recommendations. |
+| [offer-scout](skills/offer-scout/) | Scan live freelance sites, job boards and classifieds, then rank 100 offer ideas and shortlist the 10 with the widest gap between return and total cost. |
+| [proposal-writer](skills/proposal-writer/) | Turn a chosen offer into a full sales proposal, the short platform bid, pricing options and a three-touch follow-up sequence. |
 <!-- SKILLS:END -->
 
 ## Installation
@@ -128,6 +130,8 @@ Once installed, ask Claude to help with content tasks and it will pick the right
 "What should I post this week" → niche-research or content-matrix
 "Turn this outlier Reel into a script" → reels-scripting
 "I need a thumbnail for 'How I fired my team'" → youtube-thumbnail
+"What should I sell in this niche" → offer-scout
+"Write me a proposal for this client" → proposal-writer
 "Write me a pinned comment" → pinned-comment
 ```
 
@@ -161,6 +165,10 @@ Once installed, ask Claude to help with content tasks and it will pick the right
 
 ### Analytics
 - `analytics-dashboard` — LinkedIn export to dashboard + 5 recommendations
+
+### Sales
+- `offer-scout` — evidence-based market scan, 100 offer ideas, top 10 by Leverage Gap Score
+- `proposal-writer` — full proposal, marketplace bid, pricing options, follow-ups
 
 ## Prerequisites
 
