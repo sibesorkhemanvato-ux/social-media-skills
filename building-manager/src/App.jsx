@@ -30,13 +30,13 @@ const NAV = [
 const baseInvoices = seedInvoices(seedUnits, seedSettings)
 
 export default function App() {
-  const [units, setUnits] = useLocalState('bm.units', seedUnits)
-  const [settings, setSettings] = useLocalState('bm.settings', seedSettings)
-  const [invoices, setInvoices] = useLocalState('bm.invoices', baseInvoices)
-  const [payments, setPayments] = useLocalState('bm.payments', seedPayments(baseInvoices))
-  const [expenses, setExpenses] = useLocalState('bm.expenses', seedExpenses)
-  const [announcements, setAnnouncements] = useLocalState('bm.announcements', seedAnnouncements)
-  const [tickets, setTickets] = useLocalState('bm.tickets', seedTickets)
+  const [units, setUnits] = useLocalState('bm2.units', seedUnits)
+  const [settings, setSettings] = useLocalState('bm2.settings', seedSettings)
+  const [invoices, setInvoices] = useLocalState('bm2.invoices', baseInvoices)
+  const [payments, setPayments] = useLocalState('bm2.payments', seedPayments(baseInvoices))
+  const [expenses, setExpenses] = useLocalState('bm2.expenses', seedExpenses)
+  const [announcements, setAnnouncements] = useLocalState('bm2.announcements', seedAnnouncements)
+  const [tickets, setTickets] = useLocalState('bm2.tickets', seedTickets)
 
   const [tab, setTab] = useState('dashboard')
   const [period, setPeriod] = useState(periodKey())

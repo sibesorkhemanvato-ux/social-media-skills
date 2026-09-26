@@ -13,6 +13,8 @@ export const seedUnits = [
   { id: 'u4', no: '۴', floor: 2, owner: 'سحر عباسی', resident: '—', phone: '۰۹۱۲۴۴۴۵۵۶۶', area: 110, people: 0, parking: 1, vacant: true },
   { id: 'u5', no: '۵', floor: 3, owner: 'حسین رستمی', resident: 'حسین رستمی', phone: '۰۹۱۲۵۵۵۶۶۷۷', area: 130, people: 5, parking: 2, vacant: false },
   { id: 'u6', no: '۶', floor: 3, owner: 'نگار احمدی', resident: 'نگار احمدی', phone: '۰۹۱۲۶۶۶۷۷۸۸', area: 130, people: 2, parking: 1, vacant: false },
+  { id: 'u7', no: '۷', floor: 4, owner: 'محمد جعفری', resident: 'محمد جعفری', phone: '۰۹۱۲۷۷۷۸۸۹۹', area: 120, people: 3, parking: 1, vacant: false },
+  { id: 'u8', no: '۸', floor: 4, owner: 'زهرا میرزایی', resident: 'خانواده شریفی', phone: '۰۹۱۲۸۸۸۹۹۰۰', area: 120, people: 2, parking: 1, vacant: false },
 ]
 
 export const seedSettings = {
@@ -66,8 +68,8 @@ export function seedPayments(invoices) {
   const out = []
   invoices.forEach((inv) => {
     const isPrev = inv.period === prev
-    const paidNow = ['u1', 'u3', 'u6'].includes(inv.unitId)
-    if ((isPrev && inv.unitId !== 'u4') || (!isPrev && paidNow)) {
+    const paidNow = ['u1', 'u3', 'u6', 'u7'].includes(inv.unitId)
+    if ((isPrev && !['u4', 'u8'].includes(inv.unitId)) || (!isPrev && paidNow)) {
       out.push({
         id: uid(),
         unitId: inv.unitId,
