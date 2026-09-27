@@ -2,7 +2,7 @@ name: انتشار اپ مدیر ساختمان روی GitHub Pages
 
 on:
   push:
-    branches: [arena/01a0dee2-social-media-skills, main]
+    branches: [arena/01a0e1c9-social-media-skills, main]
     paths:
       - 'building-manager/**'
       - '.github/workflows/deploy-building-manager.yml'
