@@ -17,6 +17,8 @@
 
 html, body, #root { height: 100%; }
 
+html, body { overflow-x: hidden; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -29,7 +31,13 @@ body {
 h2, h3, h4 { margin: 0; font-weight: 700; }
 p { margin: 0 0 .4rem; }
 
-.app { display: flex; min-height: 100vh; }
+.app { display: flex; min-height: 100vh; min-width: 0; }
+
+/* Keep flexible page sections inside the viewport. Tables still scroll inside
+   .table-wrap instead of increasing the width of the whole page. */
+.main, .content, .card, .card-body, .card-head,
+.grid-2, .stats, .notes, .board, .rules, .duties { min-width: 0; }
+.table-wrap { min-width: 0; max-width: 100%; }
 
 /* ---------- sidebar ---------- */
 .sidebar {
@@ -78,7 +86,12 @@ p { margin: 0 0 .4rem; }
 }
 .topbar h2 { font-size: 18px; }
 .topbar .muted { font-size: 12px; margin: 0; }
-.topbar-side { margin-inline-start: auto; display: flex; gap: 8px; }
+.topbar-side {
+  margin-inline-start: auto; display: flex; gap: 8px;
+  min-width: 0; flex-wrap: wrap; justify-content: flex-end;
+}
+.topbar-side .who { min-width: 0; }
+.topbar-side .who .input { min-width: 0; flex: 1 1 auto; }
 .chip {
   background: #eef2f9; border-radius: 999px; padding: 4px 12px;
   font-size: 12px; color: var(--muted); white-space: nowrap;
@@ -246,6 +259,25 @@ p { margin: 0 0 .4rem; }
   .scrim { display: block; position: fixed; inset: 0; background: rgba(15, 23, 42, .4); z-index: 30; }
   .menu { display: inline-block; }
   .content { padding: 14px; }
+
+  /* The header contains several status chips on desktop. On a phone they
+     must wrap below the title rather than force the document wider. */
+  .topbar { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+  .topbar > div:first-of-type { flex: 1 1 0; min-width: 0; }
+  .topbar-side {
+    flex: 1 1 100%; width: 100%; margin-inline-start: 0;
+    justify-content: flex-start; gap: 6px;
+  }
+  .topbar-side .who { flex: 1 1 100%; width: 100%; }
+  .topbar-side .chip { white-space: normal; }
+}
+
+@media (max-width: 420px) {
+  .content { padding: 10px; }
+  .card-head, .card-body { padding-inline: 12px; }
+  .topbar h2 { font-size: 16px; }
+  .mini-stats { gap: 8px 14px; }
+  .btn { padding-inline: 10px; }
 }
 
 /* ---------- خودگردانی: قانون‌نامه، رأی‌گیری، نوبت‌ها ---------- */
