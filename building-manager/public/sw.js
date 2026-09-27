@@ -1,5 +1,6 @@
 // سرویس‌ورکر ساده: اپ بعد از اولین بازدید آفلاین هم کار می‌کند
-const CACHE = 'bm-v1'
+// Change this when a release changes the app shell so installed phones refresh it.
+const CACHE = 'bm-v2'
 
 self.addEventListener('install', (e) => {
   self.skipWaiting()
