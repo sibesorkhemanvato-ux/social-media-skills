@@ -5,14 +5,20 @@ import { uid, faDateStr, todayISO, num } from '../lib/utils'
 const STATUSES = ['باز', 'در حال بررسی', 'انجام‌شده']
 const PRIORITIES = ['کم', 'متوسط', 'زیاد']
 
-export default function Tickets({ db, set }) {
+export default function Tickets({ db, set, me, addLog }) {
   const { tickets, units } = db
   const [form, setForm] = useState(null)
-  const blank = { unitId: units[0]?.id ?? '', title: '', desc: '', priority: 'متوسط', status: 'باز', createdAt: todayISO(), assignee: '' }
+  const blank = { unitId: me?.id ?? units[0]?.id ?? '', title: '', desc: '', priority: 'متوسط', status: 'باز', createdAt: todayISO(), assignee: '' }
 
   const save = (e) => {
     e.preventDefault()
-    set.tickets(form.id ? tickets.map((t) => (t.id === form.id ? form : t)) : [{ ...form, id: uid() }, ...tickets])
+    if (form.id) {
+      set.tickets(tickets.map((t) => (t.id === form.id ? form : t)))
+      addLog(`درخواست «${form.title}» ویرایش شد.`, `واحد ${me?.no}`, me?.id)
+    } else {
+      set.tickets([{ ...form, id: uid(), createdByUnitId: me?.id }, ...tickets])
+      addLog(`درخواست «${form.title}» ثبت شد.`, `واحد ${me?.no}`, me?.id)
+    }
     setForm(null)
   }
 

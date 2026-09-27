@@ -7,14 +7,14 @@ const d = (daysAgo) =>
   new Date(Date.now() - daysAgo * 86400000).toISOString().slice(0, 10)
 
 export const seedUnits = [
-  { id: 'u1', no: '۱', floor: 1, owner: 'رضا کریمی', resident: 'رضا کریمی', phone: '۰۹۱۲۱۱۱۲۲۳۳', area: 95, people: 3, parking: 1, vacant: false },
-  { id: 'u2', no: '۲', floor: 1, owner: 'مریم صادقی', resident: 'خانواده نوری', phone: '۰۹۱۲۲۲۲۳۳۴۴', area: 95, people: 4, parking: 1, vacant: false },
-  { id: 'u3', no: '۳', floor: 2, owner: 'علی موسوی', resident: 'علی موسوی', phone: '۰۹۱۲۳۳۳۴۴۵۵', area: 110, people: 2, parking: 1, vacant: false },
-  { id: 'u4', no: '۴', floor: 2, owner: 'سحر عباسی', resident: '—', phone: '۰۹۱۲۴۴۴۵۵۶۶', area: 110, people: 0, parking: 1, vacant: true },
-  { id: 'u5', no: '۵', floor: 3, owner: 'حسین رستمی', resident: 'حسین رستمی', phone: '۰۹۱۲۵۵۵۶۶۷۷', area: 130, people: 5, parking: 2, vacant: false },
-  { id: 'u6', no: '۶', floor: 3, owner: 'نگار احمدی', resident: 'نگار احمدی', phone: '۰۹۱۲۶۶۶۷۷۸۸', area: 130, people: 2, parking: 1, vacant: false },
-  { id: 'u7', no: '۷', floor: 4, owner: 'محمد جعفری', resident: 'محمد جعفری', phone: '۰۹۱۲۷۷۷۸۸۹۹', area: 120, people: 3, parking: 1, vacant: false },
-  { id: 'u8', no: '۸', floor: 4, owner: 'زهرا میرزایی', resident: 'خانواده شریفی', phone: '۰۹۱۲۸۸۸۹۹۰۰', area: 120, people: 2, parking: 1, vacant: false },
+  { id: 'u1', no: '۱', floor: 1, owner: 'رضا کریمی', resident: 'رضا کریمی', phone: '۰۹۱۲۱۱۱۲۲۳۳', area: 95, people: 3, parking: 1, vacant: false, occupancyStatus: 'مالک ساکن' },
+  { id: 'u2', no: '۲', floor: 1, owner: 'مریم صادقی', resident: 'خانواده نوری', phone: '۰۹۱۲۲۲۲۳۳۴۴', area: 95, people: 4, parking: 1, vacant: false, occupancyStatus: 'مستأجر' },
+  { id: 'u3', no: '۳', floor: 2, owner: 'علی موسوی', resident: 'علی موسوی', phone: '۰۹۱۲۳۳۳۴۴۵۵', area: 110, people: 2, parking: 1, vacant: false, occupancyStatus: 'مالک ساکن' },
+  { id: 'u4', no: '۴', floor: 2, owner: 'سحر عباسی', resident: '', phone: '۰۹۱۲۴۴۴۵۵۶۶', area: 110, people: 0, parking: 1, vacant: true, occupancyStatus: 'خالی' },
+  { id: 'u5', no: '۵', floor: 3, owner: 'حسین رستمی', resident: 'حسین رستمی', phone: '۰۹۱۲۵۵۵۶۶۷۷', area: 130, people: 5, parking: 2, vacant: false, occupancyStatus: 'مالک ساکن' },
+  { id: 'u6', no: '۶', floor: 3, owner: 'نگار احمدی', resident: 'نگار احمدی', phone: '۰۹۱۲۶۶۶۷۷۸۸', area: 130, people: 2, parking: 1, vacant: false, occupancyStatus: 'مالک ساکن' },
+  { id: 'u7', no: '۷', floor: 4, owner: 'محمد جعفری', resident: 'محمد جعفری', phone: '۰۹۱۲۷۷۷۸۸۹۹', area: 120, people: 3, parking: 1, vacant: false, occupancyStatus: 'مالک ساکن' },
+  { id: 'u8', no: '۸', floor: 4, owner: 'زهرا میرزایی', resident: 'خانواده شریفی', phone: '۰۹۱۲۸۸۸۹۹۰۰', area: 120, people: 2, parking: 1, vacant: false, occupancyStatus: 'مستأجر' },
 ]
 
 export const seedSettings = {
@@ -118,4 +118,35 @@ export function seedVotes(units) {
 
 export const seedElevatorServices = [
   { id: uid(), date: d(18), company: 'آسان‌بر ایمن', technician: 'آقای محمدی', cost: 2400000, note: 'بازبینی موتور، روغن‌کاری ریل‌ها و آزمون ترمز اضطراری' },
+]
+
+const future = (days) =>
+  new Date(Date.now() + days * 86400000).toISOString().slice(0, 10)
+
+/** داده‌های نمونه مسئولیت‌ها؛ هر مورد به حساب واحد مربوط متصل است. */
+export const seedResponsibilities = [
+  {
+    id: uid(), unitId: 'u1', assigneeName: 'رضا کریمی',
+    title: 'مسئول خرید اقلام نظافت',
+    description: 'بررسی موجودی انبار و تهیه شوینده و کیسه زباله برای ماه آینده.',
+    startDate: d(8), dueDate: future(3), status: 'فعال', createdAt: d(8),
+  },
+  {
+    id: uid(), unitId: 'u3', assigneeName: 'علی موسوی',
+    title: 'مسئول هماهنگی سرویس آسانسور',
+    description: 'هماهنگی بازدید دوره‌ای و دریافت گزارش کتبی سرویس‌کار.',
+    startDate: d(20), dueDate: d(2), status: 'فعال', createdAt: d(20),
+  },
+  {
+    id: uid(), unitId: 'u6', assigneeName: 'نگار احمدی',
+    title: 'مسئول پرداخت قبض آب',
+    description: 'ثبت شناسه پرداخت در دفتر رویدادها پس از تسویه قبض.',
+    startDate: d(40), dueDate: d(15), status: 'انجام‌شده', createdAt: d(40),
+  },
+  {
+    id: uid(), unitId: 'u7', assigneeName: 'محمد جعفری',
+    title: 'مسئول پیگیری تعمیرات',
+    description: 'دریافت برآورد تعمیر در پارکینگ.',
+    startDate: d(30), dueDate: d(12), status: 'لغوشده', createdAt: d(30),
+  },
 ]

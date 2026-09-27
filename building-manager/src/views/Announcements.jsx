@@ -5,15 +5,19 @@ import { uid, faDateStr, todayISO } from '../lib/utils'
 const CATS = ['اطلاعیه', 'جلسه', 'مالی', 'تعمیرات', 'هشدار']
 const blank = { title: '', body: '', category: 'اطلاعیه', date: todayISO(), pinned: false }
 
-export default function Announcements({ db, set }) {
+export default function Announcements({ db, set, me, addLog }) {
   const { announcements } = db
   const [form, setForm] = useState(null)
 
   const save = (e) => {
     e.preventDefault()
-    set.announcements(
-      form.id ? announcements.map((a) => (a.id === form.id ? form : a)) : [{ ...form, id: uid() }, ...announcements],
-    )
+    if (form.id) {
+      set.announcements(announcements.map((item) => item.id === form.id ? form : item))
+      addLog(`اعلان «${form.title}» ویرایش شد.`, `واحد ${me?.no}`, me?.id)
+    } else {
+      set.announcements([{ ...form, id: uid(), createdByUnitId: me?.id }, ...announcements])
+      addLog(`اعلان «${form.title}» منتشر شد.`, `واحد ${me?.no}`, me?.id)
+    }
     setForm(null)
   }
 
