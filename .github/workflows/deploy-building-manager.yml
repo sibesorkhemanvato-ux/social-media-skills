@@ -2,7 +2,7 @@ name: انتشار اپ مدیر ساختمان روی GitHub Pages
 
 on:
   push:
-    branches: [arena/01a0e1c9-social-media-skills, main]
+    branches: [arena/01a0e3de-social-media-skills, main]
     paths:
       - 'building-manager/**'
       - '.github/workflows/deploy-building-manager.yml'
@@ -27,9 +27,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - run: npm ci
+      - run: npm run lint
       - run: npm run build
+        env:
+          # These are public endpoint identifiers, never the Bale bot token.
+          VITE_BALE_BRIDGE_URL: ${{ vars.BALE_BRIDGE_URL }}
+          VITE_BALE_BOT_USERNAME: ${{ vars.BALE_BOT_USERNAME }}
+      - run: npm ci --prefix bale-worker
+      - run: npm test --prefix bale-worker
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

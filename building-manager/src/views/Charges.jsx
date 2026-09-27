@@ -4,6 +4,7 @@ import { StatusBadge } from './Dashboard'
 import { money, num, uid, periodLabel, shiftPeriod, faDateStr, todayISO } from '../lib/utils'
 import { chargeFor, sum } from '../lib/calc'
 import { invoiceState } from '../lib/rules'
+import { notifyBale } from '../lib/bale'
 
 export default function Charges({ db, set, period, setPeriod, me, addLog }) {
   const { units, settings, constitution: c, invoices, payments } = db
@@ -21,12 +22,16 @@ export default function Charges({ db, set, period, setPeriod, me, addLog }) {
     if (fresh.length === 0) return alert(`صورتحساب ${periodLabel(period)} برای همه واحدها از قبل صادر شده است.`)
     set.invoices([...invoices, ...fresh])
     addLog(`صدور خودکار شارژ ${periodLabel(period)} برای ${num(fresh.length)} واحد.`)
+    const myInvoice = fresh.find((invoice) => invoice.unitId === me?.id)
+    if (myInvoice) void notifyBale(`💳 شارژ ${periodLabel(period)} برای واحد ${me.no} صادر شد. مبلغ: ${money(myInvoice.amount)}`)
   }
 
   const savePayment = (e) => {
     e.preventDefault()
     set.payments([...payments, { ...pay, id: uid(), amount: Number(pay.amount) }])
-    addLog(`پرداخت ${money(pay.amount)} برای واحد ${units.find((u) => u.id === pay.unitId)?.no} ثبت شد.`, `واحد ${me?.no}`)
+    const paidUnit = units.find((unit) => unit.id === pay.unitId)
+    addLog(`پرداخت ${money(pay.amount)} برای واحد ${paidUnit?.no} ثبت شد.`, `واحد ${me?.no}`)
+    if (pay.unitId === me?.id) void notifyBale(`✅ پرداخت ${money(pay.amount)} برای شارژ ${periodLabel(pay.period)} واحد ${paidUnit?.no} ثبت شد.`)
     setPay(null)
   }
 
