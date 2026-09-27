@@ -17,7 +17,7 @@ export default function Charges({ db, set, period, setPeriod, me, addLog }) {
     const existing = new Set(monthInvoices.map((i) => i.unitId))
     const fresh = units
       .filter((u) => !existing.has(u.id))
-      .map((u) => ({ id: uid(), unitId: u.id, period, amount: chargeFor(u, settings), createdAt: todayISO() }))
+      .map((u) => ({ id: uid(), unitId: u.id, period, amount: chargeFor(u, settings, units.length), createdAt: todayISO() }))
     if (fresh.length === 0) return alert(`صورتحساب ${periodLabel(period)} برای همه واحدها از قبل صادر شده است.`)
     set.invoices([...invoices, ...fresh])
     addLog(`صدور خودکار شارژ ${periodLabel(period)} برای ${num(fresh.length)} واحد.`)

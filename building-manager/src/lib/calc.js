@@ -1,11 +1,13 @@
-/** محاسبه شارژ ماهانه یک واحد بر اساس فرمول تنظیمات */
-export function chargeFor(unit, s) {
-  const base =
-    Number(s.fixed || 0) +
-    Number(s.perPerson || 0) * Number(unit.people || 0) +
-    Number(s.perArea || 0) * Number(unit.area || 0) +
-    Number(s.perParking || 0) * Number(unit.parking || 0)
-  return Math.round(unit.vacant ? (base * Number(s.vacantRatio || 0)) / 100 : base)
+/** هزینه‌های مشترک ماهانه که به‌طور مساوی میان همه واحدها تقسیم می‌شوند */
+export const SHARED_CHARGE_KEYS = ['cleaning', 'water', 'elevator', 'commonElectricity', 'miscellaneous']
+
+export function sharedChargeTotal(s) {
+  return SHARED_CHARGE_KEYS.reduce((total, key) => total + Number(s[key] || 0), 0)
+}
+
+/** سهم برابر یک واحد از کل هزینه‌های مشترک ماهانه */
+export function chargeFor(_unit, s, unitCount = 1) {
+  return Math.round(sharedChargeTotal(s) / Math.max(1, Number(unitCount) || 1))
 }
 
 export const sum = (arr, f = (x) => x) => arr.reduce((a, b) => a + Number(f(b) || 0), 0)

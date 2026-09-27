@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Card, Button, Field, Modal, Badge } from '../components/ui'
 import { money, num } from '../lib/utils'
-import { chargeFor } from '../lib/calc'
+import { chargeFor, sharedChargeTotal } from '../lib/calc'
 
 const FORMULA = {
-  fixed: 'مبلغ ثابت هر واحد (تومان)',
-  perPerson: 'نرخ هر نفر (تومان)',
-  perArea: 'نرخ هر متر مربع (تومان)',
-  perParking: 'نرخ هر پارکینگ (تومان)',
-  vacantRatio: 'درصد شارژ واحد خالی',
+  cleaning: 'نظافت (تومان)',
+  water: 'آب (تومان)',
+  elevator: 'آسانسور (تومان)',
+  commonElectricity: 'برق مشاعات (تومان)',
+  miscellaneous: 'متفرقه (تومان)',
 }
 
 export default function Settings({ db, set, resetAll, proposeVote, go }) {
@@ -31,7 +31,7 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
     reader.onload = () => {
       try {
         const data = JSON.parse(String(reader.result))
-        for (const k of ['units', 'invoices', 'payments', 'expenses', 'announcements', 'tickets', 'settings', 'constitution', 'votes', 'log']) {
+        for (const k of ['units', 'invoices', 'payments', 'expenses', 'announcements', 'tickets', 'settings', 'constitution', 'votes', 'log', 'elevatorServices']) {
           if (data[k]) set[k](data[k])
         }
         alert('اطلاعات با موفقیت بازیابی شد.')
@@ -59,8 +59,8 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
     <div className="stack">
       <Card title="فرمول شارژ (فقط با رأی ساکنین تغییر می‌کند)">
         <p className="muted small">
-          شارژ = مبلغ ثابت + (نرخ نفر × نفرات) + (نرخ متر × متراژ) + (نرخ پارکینگ × پارکینگ)؛ واحد خالی با ضریب {num(settings.vacantRatio)}٪.
-          چون مدیر انسانی وجود ندارد، تغییر هر عدد نیازمند {num(c.quorum)} رأی از {num(units.length)} است.
+          مجموع هزینه‌های نظافت، آب، آسانسور، برق مشاعات و متفرقه به‌طور مساوی میان {num(units.length)} واحد تقسیم می‌شود؛ واحدهای خالی نیز سهم برابر دارند.
+          تغییر هر مبلغ نیازمند {num(c.quorum)} رأی از {num(units.length)} است.
         </p>
         <div className="rules">
           {Object.keys(FORMULA).map((k) => {
@@ -78,23 +78,23 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
           })}
         </div>
 
-        <h4 className="mt">پیش‌نمایش شارژ ماهانه {num(units.length)} واحد</h4>
+        <div className="formula">جمع هزینه ماهانه: <strong>{money(sharedChargeTotal(settings))}</strong> ÷ {num(units.length)} واحد = <strong>{money(chargeFor(units[0], settings, units.length))}</strong> برای هر واحد</div>
+        <h4 className="mt">پیش‌نمایش تقسیم مساوی بین {num(units.length)} واحد</h4>
         <div className="table-wrap">
           <table className="table">
-            <thead><tr><th>واحد</th><th>متراژ</th><th>نفرات</th><th>پارکینگ</th><th>شارژ محاسبه‌شده</th></tr></thead>
+            <thead><tr><th>واحد</th><th>وضعیت</th><th>روش تقسیم</th><th>شارژ محاسبه‌شده</th></tr></thead>
             <tbody>
               {units.map((u) => (
                 <tr key={u.id}>
-                  <td>واحد {u.no}{u.vacant ? ' (خالی)' : ''}</td>
-                  <td>{num(u.area)} م²</td>
-                  <td>{num(u.people)}</td>
-                  <td>{num(u.parking)}</td>
-                  <td><strong>{money(chargeFor(u, settings))}</strong></td>
+                  <td>واحد {u.no}</td>
+                  <td>{u.vacant ? 'خالی' : 'مسکونی'}</td>
+                  <td>سهم برابر</td>
+                  <td><strong>{money(chargeFor(u, settings, units.length))}</strong></td>
                 </tr>
               ))}
               <tr className="total-row">
-                <td colSpan="4">جمع شارژ ماهانه ساختمان</td>
-                <td><strong>{money(units.reduce((a, u) => a + chargeFor(u, settings), 0))}</strong></td>
+                <td colSpan="3">جمع شارژ ماهانه ساختمان</td>
+                <td><strong>{money(units.reduce((a, u) => a + chargeFor(u, settings, units.length), 0))}</strong></td>
               </tr>
             </tbody>
           </table>

@@ -69,7 +69,7 @@ export default function Units({ db, set, me }) {
                     <td>{num(u.area)} م²</td>
                     <td>{num(u.people)}</td>
                     <td>{num(u.parking)}</td>
-                    <td>{money(chargeFor(u, settings))}</td>
+                    <td>{money(chargeFor(u, settings, units.length))}</td>
                     <td className={debt > 0 ? 'bad-text' : 'good-text'}>{debt > 0 ? money(debt) : 'تسویه'}</td>
                     <td className="actions">
                       <button className="icon-btn" title="ویرایش" onClick={() => edit(u)}>✏️</button>

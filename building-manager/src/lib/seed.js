@@ -21,11 +21,12 @@ export const seedSettings = {
   buildingName: 'مجتمع مسکونی یاس',
   address: 'تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲',
   manager: 'مدیر ساختمان',
-  fixed: 350000,
-  perPerson: 120000,
-  perArea: 2500,
-  perParking: 50000,
-  vacantRatio: 40, // درصد شارژ برای واحد خالی
+  cleaning: 4000000,
+  water: 2400000,
+  elevator: 1600000,
+  commonElectricity: 1200000,
+  miscellaneous: 800000,
+  elevatorIntervalDays: 30,
   dueDay: 10,
   openingBalance: 4500000,
 }
@@ -54,9 +55,9 @@ export function seedInvoices(units, s) {
   const out = []
   for (const p of [prev, cur]) {
     for (const u of units) {
-      const base =
-        s.fixed + s.perPerson * u.people + s.perArea * u.area + s.perParking * u.parking
-      const amount = Math.round(u.vacant ? (base * s.vacantRatio) / 100 : base)
+      const total = ['cleaning', 'water', 'elevator', 'commonElectricity', 'miscellaneous']
+        .reduce((sum, key) => sum + Number(s[key] || 0), 0)
+      const amount = Math.round(total / Math.max(1, units.length))
       out.push({ id: uid(), unitId: u.id, period: p, amount, createdAt: d(p === cur ? 6 : 36) })
     }
   }
@@ -114,3 +115,7 @@ export function seedVotes(units) {
     },
   ]
 }
+
+export const seedElevatorServices = [
+  { id: uid(), date: d(18), company: 'آسان‌بر ایمن', technician: 'آقای محمدی', cost: 2400000, note: 'بازبینی موتور، روغن‌کاری ریل‌ها و آزمون ترمز اضطراری' },
+]
