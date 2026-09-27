@@ -321,3 +321,13 @@ p { margin: 0 0 .4rem; }
 .duty p { margin: 0; }
 .chip.install { border: 0; cursor: pointer; background: #dbeafe; color: #1e40af; font: inherit; font-size: 12px; }
 .chip.install:hover { background: #bfdbfe; }
+
+/* ---------- about / guide ---------- */
+.about-hero { text-align: center; background: linear-gradient(145deg, #fff, #eff6ff); }
+.about-mark { font-size: 42px; }
+.about-hero h2 { font-size: 24px; }
+.credit { margin: 20px auto 0; padding-top: 14px; border-top: 1px solid var(--line); max-width: 360px; }
+.credit span { color: var(--muted); font-size: 12px; }
+.guide-list { margin: 0; padding-inline-start: 22px; }
+.guide-list li { margin-bottom: 10px; }
+.guide-list .link { padding: 0; font-size: inherit; }

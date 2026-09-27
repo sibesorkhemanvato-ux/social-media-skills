@@ -3,7 +3,7 @@ import './styles.css'
 import { useLocalState, periodKey, periodLabel, num, uid } from './lib/utils'
 import {
   seedUnits, seedSettings, seedExpenses, seedAnnouncements, seedTickets,
-  seedInvoices, seedPayments, seedVotes,
+  seedInvoices, seedPayments, seedVotes, seedElevatorServices,
 } from './lib/seed'
 import { CONSTITUTION, unitLedger, tally } from './lib/rules'
 
@@ -18,6 +18,8 @@ import Rules from './views/Rules'
 import Votes from './views/Votes'
 import Duties from './views/Duties'
 import Settings from './views/Settings'
+import Elevator from './views/Elevator'
+import About from './views/About'
 
 const NAV = [
   { key: 'dashboard', label: 'داشبورد ساختمان', icon: '🏠' },
@@ -27,10 +29,12 @@ const NAV = [
   { key: 'rules', label: 'قانون‌نامه', icon: '⚖️' },
   { key: 'duties', label: 'نوبت‌ها', icon: '🔁' },
   { key: 'tickets', label: 'درخواست تعمیرات', icon: '🛠️' },
+  { key: 'elevator', label: 'نگهداری آسانسور', icon: '🛗' },
   { key: 'announcements', label: 'تابلوی اعلانات', icon: '📢' },
   { key: 'units', label: 'واحدها و ساکنین', icon: '🚪' },
   { key: 'reports', label: 'گزارش‌ها', icon: '📊' },
   { key: 'settings', label: 'پشتیبان و اطلاعات', icon: '⚙️' },
+  { key: 'about', label: 'درباره و راهنما', icon: 'ℹ️' },
 ]
 
 const baseInvoices = seedInvoices(seedUnits, seedSettings)
@@ -46,12 +50,27 @@ export default function App() {
   const [tickets, setTickets] = useLocalState('bm3.tickets', seedTickets)
   const [votes, setVotes] = useLocalState('bm3.votes', seedVotes(seedUnits))
   const [log, setLog] = useLocalState('bm3.log', [])
+  const [elevatorServices, setElevatorServices] = useLocalState('bm3.elevatorServices', seedElevatorServices)
   const [meId, setMeId] = useLocalState('bm3.me', seedUnits[0].id)
 
   const [tab, setTab] = useState('dashboard')
   const [period, setPeriod] = useState(periodKey())
   const [menuOpen, setMenuOpen] = useState(false)
   const [installer, setInstaller] = useState(null)
+
+  // مهاجرت بی‌خطر تنظیمات نسخه‌های قبلی به فرمول تقسیم مساوی
+  useEffect(() => {
+    if (settings.cleaning !== undefined) return
+    setSettings((old) => ({
+      ...old,
+      cleaning: seedSettings.cleaning,
+      water: seedSettings.water,
+      elevator: seedSettings.elevator,
+      commonElectricity: seedSettings.commonElectricity,
+      miscellaneous: seedSettings.miscellaneous,
+      elevatorIntervalDays: seedSettings.elevatorIntervalDays,
+    }))
+  }, [settings.cleaning, setSettings])
 
   // امکان نصب اپ روی گوشی (PWA)
   useEffect(() => {
@@ -62,11 +81,11 @@ export default function App() {
 
   const me = units.find((u) => u.id === meId) ?? units[0]
 
-  const db = { units, settings, constitution, invoices, payments, expenses, announcements, tickets, votes, log }
+  const db = { units, settings, constitution, invoices, payments, expenses, announcements, tickets, votes, log, elevatorServices }
   const set = {
     units: setUnits, settings: setSettings, constitution: setConstitution, invoices: setInvoices,
     payments: setPayments, expenses: setExpenses, announcements: setAnnouncements,
-    tickets: setTickets, votes: setVotes, log: setLog,
+    tickets: setTickets, votes: setVotes, log: setLog, elevatorServices: setElevatorServices,
   }
 
   const addLog = useCallback(
@@ -128,7 +147,7 @@ export default function App() {
     setUnits(seedUnits); setSettings(seedSettings); setConstitution(CONSTITUTION)
     setInvoices(inv); setPayments(seedPayments(inv)); setExpenses(seedExpenses)
     setAnnouncements(seedAnnouncements); setTickets(seedTickets)
-    setVotes(seedVotes(seedUnits)); setLog([])
+    setVotes(seedVotes(seedUnits)); setLog([]); setElevatorServices(seedElevatorServices)
   }
 
   const go = (k) => { setTab(k); setMenuOpen(false) }
@@ -157,6 +176,8 @@ export default function App() {
     votes: <Votes {...props} />,
     duties: <Duties {...props} />,
     settings: <Settings {...props} resetAll={resetAll} />,
+    elevator: <Elevator {...props} />,
+    about: <About {...props} />,
   }
   const current = NAV.find((n) => n.key === tab)
 
