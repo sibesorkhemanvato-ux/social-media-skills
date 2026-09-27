@@ -28,9 +28,9 @@ export function Badge({ children, tone = 'gray' }) {
   return <span className={`badge ${tone}`}>{children}</span>
 }
 
-export function Button({ children, variant = 'ghost', ...rest }) {
+export function Button({ children, variant = 'ghost', className = '', ...rest }) {
   return (
-    <button className={`btn ${variant}`} {...rest}>
+    <button className={`btn ${variant} ${className}`.trim()} {...rest}>
       {children}
     </button>
   )

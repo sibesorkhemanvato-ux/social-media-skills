@@ -3,9 +3,10 @@ import './styles.css'
 import { useLocalState, periodKey, periodLabel, num, uid } from './lib/utils'
 import {
   seedUnits, seedSettings, seedExpenses, seedAnnouncements, seedTickets,
-  seedInvoices, seedPayments, seedVotes, seedElevatorServices,
+  seedInvoices, seedPayments, seedVotes, seedElevatorServices, seedResponsibilities,
 } from './lib/seed'
 import { CONSTITUTION, unitLedger, tally } from './lib/rules'
+import { belongsToProfile, responsibilityTiming } from './lib/responsibilities'
 
 import Dashboard from './views/Dashboard'
 import Units from './views/Units'
@@ -20,9 +21,12 @@ import Duties from './views/Duties'
 import Settings from './views/Settings'
 import Elevator from './views/Elevator'
 import About from './views/About'
+import MyAccount from './views/MyAccount'
+import Onboarding from './views/Onboarding'
 
 const NAV = [
   { key: 'dashboard', label: 'داشبورد ساختمان', icon: '🏠' },
+  { key: 'account', label: 'حساب من', icon: '👤' },
   { key: 'charges', label: 'شارژ و پرداخت‌ها', icon: '💳' },
   { key: 'expenses', label: 'هزینه‌ها و صندوق', icon: '🧾' },
   { key: 'votes', label: 'رأی‌گیری‌ها', icon: '🗳️' },
@@ -51,7 +55,8 @@ export default function App() {
   const [votes, setVotes] = useLocalState('bm3.votes', seedVotes(seedUnits))
   const [log, setLog] = useLocalState('bm3.log', [])
   const [elevatorServices, setElevatorServices] = useLocalState('bm3.elevatorServices', seedElevatorServices)
-  const [meId, setMeId] = useLocalState('bm3.me', seedUnits[0].id)
+  const [responsibilities, setResponsibilities] = useLocalState('bm3.responsibilities', seedResponsibilities)
+  const [profile, setProfile] = useLocalState('bm3.profile', null)
 
   const [tab, setTab] = useState('dashboard')
   const [period, setPeriod] = useState(periodKey())
@@ -72,6 +77,18 @@ export default function App() {
     }))
   }, [settings.cleaning, setSettings])
 
+  // تکمیل بی‌خطر داده واحدهای ذخیره‌شده در نسخه‌های قبلی
+  useEffect(() => {
+    if (units.every((unit) => unit.occupancyStatus)) return
+    setUnits((old) => old.map((unit) => ({
+      ...unit,
+      occupancyStatus: unit.occupancyStatus || (unit.vacant ? 'خالی' : unit.resident === unit.owner ? 'مالک ساکن' : 'مستأجر'),
+    })))
+  }, [units, setUnits])
+
+  // هویت قدیمی قابل انتخاب دیگر استفاده نمی‌شود.
+  useEffect(() => { localStorage.removeItem('bm3.me') }, [])
+
   // امکان نصب اپ روی گوشی (PWA)
   useEffect(() => {
     const h = (e) => { e.preventDefault(); setInstaller(e) }
@@ -79,17 +96,23 @@ export default function App() {
     return () => window.removeEventListener('beforeinstallprompt', h)
   }, [])
 
-  const me = units.find((u) => u.id === meId) ?? units[0]
+  const me = profile ? units.find((unit) => unit.id === profile.unitId) : null
 
-  const db = { units, settings, constitution, invoices, payments, expenses, announcements, tickets, votes, log, elevatorServices }
+  const db = {
+    units, settings, constitution, invoices, payments, expenses, announcements,
+    tickets, votes, log, elevatorServices, responsibilities, profile,
+  }
   const set = {
     units: setUnits, settings: setSettings, constitution: setConstitution, invoices: setInvoices,
     payments: setPayments, expenses: setExpenses, announcements: setAnnouncements,
     tickets: setTickets, votes: setVotes, log: setLog, elevatorServices: setElevatorServices,
+    responsibilities: setResponsibilities, profile: setProfile,
   }
 
   const addLog = useCallback(
-    (text, actor = 'سیستم') => setLog((l) => [{ id: uid(), at: new Date().toISOString(), actor, text }, ...l].slice(0, 200)),
+    (text, actor = 'سیستم', actorUnitId = null) => setLog((items) => [
+      { id: uid(), at: new Date().toISOString(), actor, actorUnitId, text }, ...items,
+    ].slice(0, 200)),
     [setLog],
   )
 
@@ -98,7 +121,7 @@ export default function App() {
     ({ type, title, desc, payload }) => {
       const v = {
         id: uid(), type, title, desc, payload,
-        proposedBy: meId,
+        proposedBy: profile?.unitId,
         createdAt: new Date().toISOString(),
         deadline: new Date(Date.now() + constitution.voteHours * 3600000).toISOString(),
         ballots: {}, status: 'باز',
@@ -107,7 +130,7 @@ export default function App() {
       addLog(`رأی‌گیری «${title}» توسط واحد ${me?.no} آغاز شد.`, `واحد ${me?.no}`)
       return v
     },
-    [constitution.voteHours, meId, me, setVotes, addLog],
+    [constitution.voteHours, profile?.unitId, me, setVotes, addLog],
   )
 
   /** موتور خودکار: نتیجه رأی‌ها را قطعی و اجرا می‌کند (بدون دخالت انسان) */
@@ -142,12 +165,53 @@ export default function App() {
   }, [votes, units.length, constitution, setVotes, setConstitution, setExpenses, setSettings, addLog])
 
   const resetAll = () => {
-    if (!confirm('همه اطلاعات پاک و داده‌های نمونه جایگزین می‌شود. مطمئن هستید؟')) return
+    if (!confirm('همه اطلاعات و حساب این دستگاه پاک و داده‌های نمونه جایگزین می‌شود. مطمئن هستید؟')) return
     const inv = seedInvoices(seedUnits, seedSettings)
     setUnits(seedUnits); setSettings(seedSettings); setConstitution(CONSTITUTION)
     setInvoices(inv); setPayments(seedPayments(inv)); setExpenses(seedExpenses)
     setAnnouncements(seedAnnouncements); setTickets(seedTickets)
     setVotes(seedVotes(seedUnits)); setLog([]); setElevatorServices(seedElevatorServices)
+    setResponsibilities(seedResponsibilities); setProfile(null)
+  }
+
+  const restoreBackup = (data) => {
+    if (!data || typeof data !== 'object') throw new Error('invalid backup')
+    const restoredUnits = Array.isArray(data.units) ? data.units : units
+    if (!data.profile || !restoredUnits.some((unit) => unit.id === data.profile.unitId)) {
+      alert('این پشتیبان حساب متصل به یک واحد ندارد. ابتدا ثبت اولیه را انجام دهید و سپس داده‌های قدیمی را از بخش پشتیبان بازیابی کنید.')
+      return false
+    }
+    const stateSetters = {
+      units: setUnits, settings: setSettings, constitution: setConstitution,
+      invoices: setInvoices, payments: setPayments, expenses: setExpenses,
+      announcements: setAnnouncements, tickets: setTickets, votes: setVotes,
+      log: setLog, elevatorServices: setElevatorServices,
+      responsibilities: setResponsibilities, profile: setProfile,
+    }
+    Object.entries(stateSetters).forEach(([key, setter]) => {
+      if (data[key] !== undefined) setter(data[key])
+    })
+    alert('اطلاعات و حساب شما با موفقیت بازیابی شد.')
+    return true
+  }
+
+  const createProfile = (newProfile, responsibility) => {
+    const name = `${newProfile.firstName} ${newProfile.lastName}`.trim()
+    setProfile(newProfile)
+    setUnits((items) => items.map((unit) => unit.id === newProfile.unitId
+      ? {
+          ...unit,
+          resident: name,
+          phone: newProfile.phone,
+          vacant: false,
+          occupancyStatus: (unit.owner || '').trim() === name ? 'مالک ساکن' : 'مستأجر',
+        }
+      : unit))
+    if (responsibility) setResponsibilities((items) => [responsibility, ...items])
+    setLog((items) => [{
+      id: uid(), at: new Date().toISOString(), actor: `واحد ${units.find((unit) => unit.id === newProfile.unitId)?.no ?? '—'}`,
+      actorUnitId: newProfile.unitId, text: 'حساب ساکن روی این دستگاه ثبت شد.',
+    }, ...items].slice(0, 200))
   }
 
   const go = (k) => { setTab(k); setMenuOpen(false) }
@@ -157,7 +221,12 @@ export default function App() {
   const publicDebtors = ledgers.filter((x) => x.l.isPublic)
   const openVotes = votes.filter((v) => v.status === 'باز')
   const openTickets = tickets.filter((t) => t.status !== 'انجام‌شده')
+  const responsibilityReminders = me ? responsibilities.filter((item) => {
+    const level = responsibilityTiming(item).level
+    return belongsToProfile(item, profile, me) && item.status === 'فعال' && level !== 'normal'
+  }) : []
   const badges = {
+    account: responsibilityReminders.length || null,
     votes: openVotes.length || null,
     charges: debtors.length || null,
     tickets: openTickets.length || null,
@@ -166,6 +235,7 @@ export default function App() {
   const props = { db, set, period, setPeriod, go, me, proposeVote, addLog, ledgers, publicDebtors }
   const views = {
     dashboard: <Dashboard {...props} />,
+    account: me ? <MyAccount {...props} /> : null,
     units: <Units {...props} />,
     charges: <Charges {...props} />,
     expenses: <Expenses {...props} />,
@@ -180,6 +250,12 @@ export default function App() {
     about: <About {...props} />,
   }
   const current = NAV.find((n) => n.key === tab)
+
+  if (!profile || !me) {
+    return <Onboarding units={units} onCreate={createProfile} onRestore={restoreBackup} />
+  }
+
+  const profileName = profile.fullName || [profile.firstName, profile.lastName].filter(Boolean).join(' ')
 
   return (
     <div className="app">
@@ -216,12 +292,11 @@ export default function App() {
             <p className="muted">دوره جاری: {periodLabel(period)}</p>
           </div>
           <div className="topbar-side">
-            <label className="who">
-              <span className="small muted">من:</span>
-              <select className="input tiny" value={meId} onChange={(e) => setMeId(e.target.value)}>
-                {units.map((u) => <option key={u.id} value={u.id}>واحد {u.no} — {u.resident || u.owner}</option>)}
-              </select>
-            </label>
+            <button className="account-chip" onClick={() => go('account')} title="رفتن به حساب من">
+              <span className="account-chip-avatar">{profile.firstName?.slice(0, 1) || 'س'}</span>
+              <span><strong>{profileName}</strong><small>واحد {me.no}</small></span>
+              {responsibilityReminders.length > 0 && <span className="account-chip-alert">{num(responsibilityReminders.length)}</span>}
+            </button>
             {installer && (
               <button className="chip install" onClick={() => { installer.prompt(); setInstaller(null) }}>
                 ⬇️ نصب روی گوشی

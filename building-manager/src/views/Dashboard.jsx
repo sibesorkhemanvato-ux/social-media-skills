@@ -2,9 +2,10 @@ import { Card, Stat, Badge, Empty, Button } from '../components/ui'
 import { money, periodLabel, shiftPeriod, faDateStr, num } from '../lib/utils'
 import { sum, fundBalance } from '../lib/calc'
 import { tally, dutiesFor } from '../lib/rules'
+import { belongsToProfile, responsibilityTiming } from '../lib/responsibilities'
 
 export default function Dashboard({ db, period, go, me, ledgers, publicDebtors }) {
-  const { units, invoices, payments, expenses, announcements, tickets, settings, constitution: c, votes, log } = db
+  const { units, invoices, payments, expenses, announcements, tickets, settings, constitution: c, votes, log, responsibilities, profile } = db
 
   const balance = fundBalance(settings, payments, expenses)
   const monthBilled = sum(invoices.filter((i) => i.period === period), (i) => i.amount)
@@ -15,6 +16,10 @@ export default function Dashboard({ db, period, go, me, ledgers, publicDebtors }
   const openTickets = tickets.filter((t) => t.status !== 'انجام‌شده')
   const myLedger = ledgers.find((x) => x.u.id === me?.id)
   const myDuty = dutiesFor(period, units).filter((d) => d.unit.id === me?.id)
+  const responsibilityReminders = responsibilities.filter((item) => {
+    const level = responsibilityTiming(item).level
+    return belongsToProfile(item, profile, me) && item.status === 'فعال' && level !== 'normal'
+  })
 
   const months = Array.from({ length: 6 }, (_, i) => shiftPeriod(period, i - 5))
   const chart = months.map((p) => ({
@@ -50,6 +55,21 @@ export default function Dashboard({ db, period, go, me, ledgers, publicDebtors }
           </div>
         </div>
       </Card>
+
+      {responsibilityReminders.length > 0 && (
+        <div className="dashboard-reminders">
+          {responsibilityReminders.map((item) => {
+            const timing = responsibilityTiming(item)
+            return (
+              <button key={item.id} className={`responsibility-alert ${timing.level}`} onClick={() => go('account')}>
+                <span className="alert-icon">{timing.level === 'overdue' ? '🚨' : '⏰'}</span>
+                <span><strong>{item.title}</strong><small>{timing.label} · مهلت {faDateStr(item.dueDate)}</small></span>
+                <span className="alert-action">حساب من</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div className="stats">
         <Stat label="موجودی صندوق" value={money(balance)} hint="قابل مشاهده برای همه واحدها" tone={balance < 0 ? 'bad' : 'good'} />

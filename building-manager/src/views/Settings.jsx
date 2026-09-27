@@ -19,9 +19,11 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
   const exportJSON = () => {
     const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' })
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
+    const url = URL.createObjectURL(blob)
+    a.href = url
     a.download = `پشتیبان-ساختمان-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
+    URL.revokeObjectURL(url)
   }
 
   const importJSON = (e) => {
@@ -31,10 +33,17 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
     reader.onload = () => {
       try {
         const data = JSON.parse(String(reader.result))
-        for (const k of ['units', 'invoices', 'payments', 'expenses', 'announcements', 'tickets', 'settings', 'constitution', 'votes', 'log', 'elevatorServices']) {
-          if (data[k]) set[k](data[k])
-        }
-        alert('اطلاعات با موفقیت بازیابی شد.')
+        const keys = [
+          'units', 'invoices', 'payments', 'expenses', 'announcements', 'tickets',
+          'settings', 'constitution', 'votes', 'log', 'elevatorServices',
+          'responsibilities', 'profile',
+        ]
+        if (!data || typeof data !== 'object' || !Array.isArray(data.units)) throw new Error('invalid backup')
+        if (data.profile && !data.units.some((unit) => unit.id === data.profile.unitId)) throw new Error('invalid profile')
+        keys.forEach((key) => {
+          if (data[key] !== undefined && set[key]) set[key](data[key])
+        })
+        alert('اطلاعات، حساب و مسئولیت‌ها با موفقیت بازیابی شد.')
       } catch {
         alert('فایل پشتیبان معتبر نیست.')
       }
@@ -111,8 +120,8 @@ export default function Settings({ db, set, resetAll, proposeVote, go }) {
 
       <Card title="پشتیبان‌گیری">
         <p className="muted">
-          داده‌ها فعلاً در مرورگر همین دستگاه ذخیره می‌شوند. در نسخهٔ سرور، همهٔ ۸ واحد به یک پایگاه داده مشترک وصل می‌شوند و
-          ربات بله یادآوری‌ها و رأی‌گیری‌ها را انجام می‌دهد.
+          همه داده‌ها، مشخصات حساب، اتصال واحد و مسئولیت‌ها در مرورگر همین دستگاه ذخیره می‌شوند.
+          فایل JSON برای انتقال یا بازیابی کامل اطلاعات نگه دارید.
         </p>
         <div className="row">
           <Button variant="primary" onClick={exportJSON}>دریافت فایل پشتیبان</Button>
