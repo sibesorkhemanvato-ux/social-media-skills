@@ -23,6 +23,7 @@ import Elevator from './views/Elevator'
 import About from './views/About'
 import MyAccount from './views/MyAccount'
 import Onboarding from './views/Onboarding'
+import BaleConnection from './views/BaleConnection'
 
 const NAV = [
   { key: 'dashboard', label: 'داشبورد ساختمان', icon: '🏠' },
@@ -37,9 +38,19 @@ const NAV = [
   { key: 'announcements', label: 'تابلوی اعلانات', icon: '📢' },
   { key: 'units', label: 'واحدها و ساکنین', icon: '🚪' },
   { key: 'reports', label: 'گزارش‌ها', icon: '📊' },
+  { key: 'bale', label: 'اتصال به بله', icon: '💬' },
   { key: 'settings', label: 'پشتیبان و اطلاعات', icon: '⚙️' },
   { key: 'about', label: 'درباره و راهنما', icon: 'ℹ️' },
 ]
+
+const MOBILE_NAV = [
+  { key: 'dashboard', label: 'خانه', icon: '🏠' },
+  { key: 'account', label: 'حساب من', icon: '👤' },
+  { key: 'charges', label: 'شارژ', icon: '💳' },
+  { key: 'tickets', label: 'درخواست‌ها', icon: '🛠️' },
+  { key: 'more', label: 'بیشتر', icon: '•••' },
+]
+const MOBILE_PRIMARY_KEYS = new Set(MOBILE_NAV.filter((item) => item.key !== 'more').map((item) => item.key))
 
 const baseInvoices = seedInvoices(seedUnits, seedSettings)
 
@@ -245,6 +256,7 @@ export default function App() {
     rules: <Rules {...props} />,
     votes: <Votes {...props} />,
     duties: <Duties {...props} />,
+    bale: <BaleConnection {...props} />,
     settings: <Settings {...props} resetAll={resetAll} />,
     elevator: <Elevator {...props} />,
     about: <About {...props} />,
@@ -312,6 +324,28 @@ export default function App() {
         </header>
         <div className="content">{views[tab]}</div>
       </main>
+
+      <nav className="mobile-bottom-nav" aria-label="ناوبری اصلی موبایل">
+        {MOBILE_NAV.map((item) => {
+          const isMore = item.key === 'more'
+          const active = isMore ? menuOpen || !MOBILE_PRIMARY_KEYS.has(tab) : tab === item.key
+          const badge = badges[isMore ? 'votes' : item.key]
+          return (
+            <button
+              key={item.key}
+              type="button"
+              className={`mobile-nav-item ${active ? 'active' : ''}`}
+              onClick={() => (isMore ? setMenuOpen(true) : go(item.key))}
+              aria-current={active ? 'page' : undefined}
+              aria-label={isMore ? 'نمایش همه بخش‌ها' : item.label}
+            >
+              <span className={`mobile-nav-icon ${isMore ? 'more' : ''}`} aria-hidden="true">{item.icon}</span>
+              <span>{item.label}</span>
+              {badge ? <span className="mobile-nav-badge">{num(badge)}</span> : null}
+            </button>
+          )
+        })}
+      </nav>
     </div>
   )
 }

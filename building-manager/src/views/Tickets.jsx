@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Button, Modal, Field, Badge, Empty } from '../components/ui'
 import { uid, faDateStr, todayISO, num } from '../lib/utils'
+import { notifyBale } from '../lib/bale'
 
 const STATUSES = ['باز', 'در حال بررسی', 'انجام‌شده']
 const PRIORITIES = ['کم', 'متوسط', 'زیاد']
@@ -18,6 +19,7 @@ export default function Tickets({ db, set, me, addLog }) {
     } else {
       set.tickets([{ ...form, id: uid(), createdByUnitId: me?.id }, ...tickets])
       addLog(`درخواست «${form.title}» ثبت شد.`, `واحد ${me?.no}`, me?.id)
+      if (form.unitId === me?.id) void notifyBale(`🛠️ درخواست «${form.title}» برای واحد ${me.no} با اولویت ${form.priority} ثبت شد.`)
     }
     setForm(null)
   }

@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "building-manager-bale",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-27",
+  "workers_dev": true,
+  "kv_namespaces": [
+    {
+      "binding": "BALE_CONNECTIONS"
+    }
+  ],
+  "vars": {
+    "APP_ORIGIN": "https://sibesorkhemanvato-ux.github.io",
+    "APP_URL": "https://sibesorkhemanvato-ux.github.io/social-media-skills/"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
