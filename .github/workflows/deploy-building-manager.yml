@@ -65,8 +65,10 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/arena/01a0eebe-social-media-skills'
     needs: build
     runs-on: ubuntu-latest
+    # The protected production environment remains reserved for main.
+    # A separate environment lets the requested Arena preview deploy without changing main.
     environment:
-      name: github-pages
+      name: ${{ github.ref == 'refs/heads/main' && 'github-pages' || 'github-pages-preview' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
