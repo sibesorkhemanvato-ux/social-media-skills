@@ -92,7 +92,7 @@ export function HeroScene() {
 
   return (
     <div className={`hero-scene ${active ? 'hero-scene--active' : ''}`} aria-label="تصویر نردبان و چراغ">
-      <img src="/images/ladder-fallback.svg" alt="نردبان و چراغ، نماد انتخاب مسیر" width="740" height="680" decoding="async" />
+      <img src={`${import.meta.env.BASE_URL}images/ladder-fallback.svg`} alt="نردبان و چراغ، نماد انتخاب مسیر" width="740" height="680" decoding="async" />
       <div className="hero-scene__canvas" ref={canvasHost} aria-hidden="true" />
     </div>
   )

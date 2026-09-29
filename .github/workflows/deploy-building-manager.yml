@@ -1,10 +1,11 @@
-name: انتشار اپ مدیر ساختمان روی GitHub Pages
+name: انتشار اپ‌ها روی GitHub Pages
 
 on:
   push:
-    branches: [arena/01a0e3de-social-media-skills, main]
+    branches: [arena/01a0e3de-social-media-skills, arena/01a0eebe-social-media-skills, main]
     paths:
       - 'building-manager/**'
+      - 'mind-architect/frontend/**'
       - '.github/workflows/deploy-building-manager.yml'
   workflow_dispatch:
 
@@ -20,30 +21,48 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: building-manager
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+
+      - name: ساخت اپ مدیر ساختمان
+        working-directory: building-manager
+        run: |
+          npm ci
+          npm run lint
+          npm run build
         env:
           # These are public endpoint identifiers, never the Bale bot token.
           VITE_BALE_BRIDGE_URL: ${{ vars.BALE_BRIDGE_URL }}
           VITE_BALE_BOT_USERNAME: ${{ vars.BALE_BOT_USERNAME }}
-      - run: npm ci --prefix bale-worker
-      - run: npm test --prefix bale-worker
+
+      - name: تست Worker بله
+        working-directory: building-manager
+        run: |
+          npm ci --prefix bale-worker
+          npm test --prefix bale-worker
+
+      - name: ساخت پیش‌نمایش معمار ذهن
+        working-directory: mind-architect/frontend
+        run: |
+          npm ci
+          VITE_BASE=/social-media-skills/mind-architect/ npm run build
+
+      - name: آماده‌سازی خروجی صفحات
+        run: |
+          mkdir -p pages-artifact/mind-architect
+          cp -R building-manager/dist/. pages-artifact/
+          cp -R mind-architect/frontend/dist/. pages-artifact/mind-architect/
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: building-manager/dist
+          path: pages-artifact
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/arena/01a0eebe-social-media-skills'
     needs: build
     runs-on: ubuntu-latest
     environment:
